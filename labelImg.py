@@ -1305,8 +1305,9 @@ class MainWindow(QMainWindow, WindowMixin):
 
         if dir_path is not None and len(dir_path) > 1:
             self.default_save_dir = dir_path
-
-        self.show_bounding_box_from_annotation_file(self.file_path)
+        
+        if self.file_path:
+            self.show_bounding_box_from_annotation_file(self.file_path)
 
         self.statusBar().showMessage('%s . Annotation will be saved to %s' %
                                      ('Change saved folder', self.default_save_dir))
@@ -1356,8 +1357,8 @@ class MainWindow(QMainWindow, WindowMixin):
         else:
             target_dir_path = ustr(default_open_dir_path)
         self.last_open_dir = target_dir_path
-        self.import_dir_images(target_dir_path)
         self.default_save_dir = target_dir_path
+        self.import_dir_images(target_dir_path)
         if self.file_path:
             self.show_bounding_box_from_annotation_file(file_path=self.file_path)
 
@@ -1422,12 +1423,10 @@ class MainWindow(QMainWindow, WindowMixin):
     def open_next_image(self, _value=False):
         # Proceeding next image without dialog if having any label
         if self.auto_saving.isChecked():
-            if self.default_save_dir is not None:
-                if self.dirty is True:
-                    self.save_file()
-            else:
+            if self.default_save_dir is None:
                 self.change_save_dir_dialog()
-                return
+            if self.dirty is True:
+                self.save_file()
 
         if not self.may_continue():
             return
